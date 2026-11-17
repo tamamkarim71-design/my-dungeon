@@ -93,6 +93,37 @@ loader.load('/models/dungeon.glb', (gltf) => {
   console.error('Error loading Dungeon:', error);
 });
 
+// Load external Wooden Crate from Sketchfab
+loader.load('/models/wooden_crate.glb', (gltf) => {
+  const crate = gltf.scene;
+
+  // Measure the original model before changing its size
+  const originalBox = new THREE.Box3().setFromObject(crate);
+  const originalSize = originalBox.getSize(new THREE.Vector3());
+
+  console.log('Original crate dimensions:', originalSize);
+
+  // Make the crate approximately 1 meter tall
+  if (originalSize.y > 0) {
+    const scale = 1 / originalSize.y;
+    crate.scale.setScalar(scale);
+  }
+
+  // Position the crate near the center of the dungeon
+  const crateBox = new THREE.Box3().setFromObject(crate);
+  const crateCenter = crateBox.getCenter(new THREE.Vector3());
+
+  crate.position.x -= crateCenter.x;
+  crate.position.z -= crateCenter.z;
+  crate.position.y -= crateBox.min.y;
+
+  scene.add(crate);
+
+  console.log('Wooden crate loaded successfully!');
+}, undefined, (error) => {
+  console.error('Error loading wooden crate:', error);
+});
+
 // Resize
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
